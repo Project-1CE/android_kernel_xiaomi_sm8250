@@ -7,6 +7,7 @@
 #include "zdata.h"
 #include "compress.h"
 #include <linux/prefetch.h>
+#include <linux/mm_inline.h>
 
 #include <trace/events/erofs.h>
 
@@ -719,12 +720,12 @@ static void z_erofs_vle_unzip_kickoff(void *ptr, int bios)
 
 static inline void z_erofs_vle_read_endio(struct bio *bio)
 {
+	int i;
 	struct erofs_sb_info *sbi = NULL;
 	blk_status_t err = bio->bi_status;
 	struct bio_vec *bvec;
-	struct bvec_iter_all iter_all;
 
-	bio_for_each_segment_all(bvec, bio, iter_all) {
+	bio_for_each_segment_all(bvec, bio, i) {
 		struct page *page = bvec->bv_page;
 		bool cachemngd = false;
 
